@@ -38,7 +38,7 @@ var cube;
 var projector, mouse = { x: 0, y: 0 }, INTERSECTED;
 var sprite1;
 var canvas1, context1, texture1;
-var knotmesh, mesh;
+var outerRing, innerRing, sphere;
 
 init();
 animate();
@@ -82,7 +82,7 @@ function init()
 	// SKYBOX/FOG
 	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
 	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 123456789, side: THREE.BackSide } );
-	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+	var skyBox = new THREE.innerRing( skyBoxGeometry, skyBoxMaterial );
 	scene.add(skyBox);
 	
 	////////////
@@ -93,15 +93,22 @@ function init()
 	geometry.mergeVertices();
 	geometry.computeCentroids();
 	var material = new THREE.MeshNormalMaterial();
-	mesh = new THREE.Mesh( geometry, material );
-	mesh.position.set(0,0,0);
+	innerRing = new THREE.mesh( geometry, material );
+	innerRing.position.set(0,0,0);
 	var knot = new THREE.TorusGeometry( 15, 3, 3, 6 );
 	knot.mergeVertices();
 	knot.computeCentroids();
-	knotmesh = new THREE.Mesh( knot, material );
-	knotmesh.position.set(0,0,0);
-	scene.add(mesh);
-	scene.add(knotmesh)
+	outerRing = new THREE.mesh( knot, material );
+	outerRing.position.set(0,0,0);
+	var dStar = new THREE.SphereGeometry( 5, 3, 3, 6 );
+	dStar.mergeVertices();
+	dStar.computeCentroids();
+	outerRing = new THREE.mesh( knot, material );
+	outerRing.position.set(0,0,0);
+deathStar = new THREE.mesh( dStar, material );
+scene.add(deathStar);
+	scene.add(innerRing);
+	scene.add(outerRing)
 }
 
 // function for drawing rounded rectangles
@@ -133,10 +140,10 @@ function update()
 {
 	controls.update();
 	stats.update();
-	knotmesh.rotation.x += 0.015;
-	 mesh.rotation.y += 0.045;
-	knotmesh.rotation.z -= 1;
-	 mesh.rotation.z += 20;
+	outerRing.rotation.x += 0.015;
+	 innerRing.rotation.y += 0.045;
+	outerRing.rotation.z -= 1;
+	 innerRing.rotation.z += 20;
 }
 
 function render() 
